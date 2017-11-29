@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<updates>
-    <update type="{{ update.update_type }}" appVersion="{{ update.version }}"
-            version="{{ update.version }}" extensionVersion="{{ update.version }}"
-            detailsURL="{{ update.details_url }}" isOSUpdate="true">
-        <patch type="{{ update.patch_type }}" URL="{{ download_path }}{{ update.filename }}" hashFunction="{{ update.hash_function }}"
-               hashValue="{{ update.hash_value }}" size="{{ update.size }}"/>
-    </update>
-</updates>
