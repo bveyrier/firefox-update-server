@@ -1,19 +1,10 @@
-from .. import app
-from sqlalchemy import Column, Integer, String, Table
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from flask_sqlalchemy_session import flask_scoped_session
 
-_base = declarative_base()
-_engine = create_engine(app.config['SQLALCHEMY_DB_URI'])
-_session_factory = sessionmaker(bind=_engine)
-session = flask_scoped_session(_session_factory, app)
+from fus import Base
 
 
-class Update(_base):
+class Update(Base):
     __tablename__ = 'updates'
     id = Column(Integer, primary_key=True)
     filename = Column(String, nullable=False)
@@ -32,9 +23,10 @@ class Update(_base):
         return "<Update(id='%s', filename='%s', version='%s')>" % (self.id, self.filename, self.version)
 
 
-class Wave(_base):
+class Wave(Base):
     __tablename__ = 'waves'
     id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
     id_update = Column(Integer, ForeignKey('updates.id'))
 
     update = relationship("Update", back_populates="waves")
@@ -43,7 +35,7 @@ class Wave(_base):
         return "<Wave(id='%s', id_update='%s')>" % (self.id, self.id_update)
 
 
-class IntermediateUpdate(_base):
+class IntermediateUpdate(Base):
     __tablename__ = 'intermediate_updates'
     id = Column(Integer, primary_key=True)
     id_update = Column(Integer, ForeignKey('updates.id'))
@@ -54,7 +46,6 @@ class IntermediateUpdate(_base):
     def __repr__(self):
         return "<IntermediateUpdate(id='%s', id_update='%s', version='%s')>" % (self.id, self.id_update, self.version)
 
-
-if app.config['SQLALCHEMY_DB_DROP']:
-    _base.metadata.drop_all(_engine)
-    _base.metadata.create_all(_engine)
+# if app.config['SQLALCHEMY_DB_DROP']:
+#     _base.metadata.drop_all(_engine)
+#     _base.metadata.create_all(_engine)
