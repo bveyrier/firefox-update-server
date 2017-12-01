@@ -10,7 +10,7 @@ class Config(object):
     HOST = '127.0.0.1'
     PORT = 8080
     SECRET_KEY = os.urandom(24).encode('hex')
-    
+
     # Database configuration
     SQLALCHEMY_DATABASE_URI = 'postgresql://fus:plop@localhost/'
     SQLALCHEMY_DATABASE_DROP = False

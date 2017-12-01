@@ -1,0 +1,57 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block body %}
+<div class="content-section">
+    <div class="outer">
+        <br/>
+        <div style="text-align: center;">{{ utils.flashed_messages() }}</div>
+        <br/>
+        <div class="inner">
+            <div class="center">
+                <h1 style="text-align:center;">Waves</h1>
+                {% if waves %}
+                <hr class="intro-divider">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="55%"> Name</th>
+                        <th width="15%"> Update</th>
+                        <th width="15%"> Edit</th>
+                        <th width="15%"> Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for wave in waves %}
+                    <tr>
+                        <td>{{ wave.name }}</td>
+                        <td>{{ wave.update.version }}</td>
+                        <td>
+                            <a href="{{ url_for('wave.edit_wave', id=wave.id) }}">
+                                <i class="fa fa-pencil"></i> Edit
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('wave.delete_wave', id=wave.id) }}"
+                               onclick="return confirm('Are you sure you want to delete this wave ?')">
+                                <i class="fa fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center">
+                    <h3> No departments have been added. </h3>
+                    <hr class="intro-divider">
+                </div>
+                {% endif %}
+                <a href="{{ url_for('wave.add_wave') }}" class="btn btn-default btn-lg">
+                    <i class="fa fa-plus"></i>
+                    Add Wave
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

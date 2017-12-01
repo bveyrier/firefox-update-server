@@ -1,0 +1,6 @@
+Flask
+Flask-Bootstrap
+Flask-SQLAlchemy
+Flask-SQLAlchemy-Session
+Flask-Psycopg2
+Flask-WTF
