@@ -34,7 +34,7 @@ def update(wave_id=None, version=None):
     wave = current_session.query(Wave).filter(wave_id == Wave.id).first()
     if wave != None and wave.update != None:
         intermediate_update = current_session.query(IntermediateUpdate).filter(
-            IntermediateUpdate.id_update == Update.id).all()
+            version < IntermediateUpdate.version).all()
         if (intermediate_update != None):
             for up in intermediate_update:
                 if not greater_than(version, up.update.version):

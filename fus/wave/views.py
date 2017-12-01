@@ -1,8 +1,7 @@
 from fus.models import Wave
-from flask import make_response, render_template, flash, url_for, redirect, abort
+from flask import render_template, flash, url_for, redirect, abort
 from flask_sqlalchemy_session import current_session
 
-from config import Config
 from . import wave
 from forms import WaveForm
 
