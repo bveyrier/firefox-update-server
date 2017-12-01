@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-update = Blueprint('update', __name__)
+wave = Blueprint('wave', __name__)
 
 from . import views
