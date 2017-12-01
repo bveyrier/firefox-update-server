@@ -1,10 +1,10 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% extends "base.html" %}
 {% block title %}
-{% if add_wave %}
-Add Wave
+{% if add_intermediate_update %}
+Add Intermediate Update
 {% else %}
-Edit Wave
+Edit Intermediate Update
 {% endif %}
 {% endblock %}
 {% block body %}
@@ -12,10 +12,10 @@ Edit Wave
     <div class="outer">
         <div class="middle">
             <div class="center">
-                {% if add_wave %}
-                <h1>Add Wave</h1>
+                {% if add_intermediate_update %}
+                <h1>Add Intermediate Update</h1>
                 {% else %}
-                <h1>Edit Wave</h1>
+                <h1>Edit Intermediate Update</h1>
                 {% endif %}
                 <br/>
                 {{ wtf.quick_form(form) }}

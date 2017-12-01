@@ -8,31 +8,31 @@
         <br/>
         <div class="inner">
             <div class="center">
-                <h1 style="text-align:center;">Waves</h1>
-                {% if waves %}
+                <h1 style="text-align:center;">Intermediate Updates</h1>
+                {% if intermediate_updates %}
                 <hr class="intro-divider">
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <th width="55%"> Name</th>
+                        <th width="55%"> Version</th>
                         <th width="15%"> Update</th>
                         <th width="15%"> Edit</th>
                         <th width="15%"> Delete</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for wave in waves %}
+                    {% for intermediate_update in intermediate_updates %}
                     <tr>
-                        <td>{{ wave.name }}</td>
-                        <td>{{ wave.update.version }}</td>
+                        <td>{{ intermediate_update.version }}</td>
+                        <td>{{ intermediate_update.update.version }}</td>
                         <td>
-                            <a href="{{ url_for('wave.edit_wave', id=wave.id) }}">
+                            <a href="{{ url_for('intermediate_update.edit_intermediate_update', id=intermediate_update.id) }}">
                                 <i class="fa fa-pencil"></i> Edit
                             </a>
                         </td>
                         <td>
-                            <a href="{{ url_for('wave.delete_wave', id=wave.id) }}"
-                               onclick="return confirm('Are you sure you want to delete this wave ?')">
+                            <a href="{{ url_for('intermediate_update.delete_intermediate_update', id=intermediate_update.id) }}"
+                               onclick="return confirm('Are you sure you want to delete this intermediate update ?')">
                                 <i class="fa fa-trash"></i> Delete
                             </a>
                         </td>
@@ -42,13 +42,13 @@
                 </table>
                 {% else %}
                 <div style="text-align: center">
-                    <h3> No waves have been added. </h3>
+                    <h3> No intermediate updates have been added. </h3>
                     <hr class="intro-divider">
                 </div>
                 {% endif %}
-                <a href="{{ url_for('wave.add_wave') }}" class="btn btn-default btn-lg">
+                <a href="{{ url_for('intermediate_update.add_intermediate_update') }}" class="btn btn-default btn-lg">
                     <i class="fa fa-plus"></i>
-                    Add Wave
+                    Add Intermediate Update
                 </a>
             </div>
         </div>

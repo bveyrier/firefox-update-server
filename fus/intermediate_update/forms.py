@@ -7,10 +7,11 @@ from flask_sqlalchemy_session import current_session
 from ..models import Update
 
 
-class WaveForm(FlaskForm):
+class IntermediateUpdateForm(FlaskForm):
     """
     Form to add or delete a wave
     """
-    name = StringField('Name', validators=[DataRequired()])
+
+    version = StringField('Version', validators=[DataRequired()])
     update = QuerySelectField(query_factory=lambda: current_session.query(Update).all(), get_label="version")
     submit = SubmitField('Submit')

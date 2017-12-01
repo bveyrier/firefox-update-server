@@ -28,4 +28,7 @@ def create_app(config_name):
     from .wave import wave as wave_blueprint
     app.register_blueprint(wave_blueprint)
 
+    from .intermediate_update import intermediate_update as intermediate_update_blueprint
+    app.register_blueprint(intermediate_update_blueprint)
+
     return app
