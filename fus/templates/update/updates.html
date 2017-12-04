@@ -1,0 +1,53 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block body %}
+<div class="content-section">
+    <div class="outer">
+        <br/>
+        <div style="text-align: center;">{{ utils.flashed_messages() }}</div>
+        <br/>
+        <div class="inner">
+            <div class="center">
+                <h1 style="text-align:center;">Updates</h1>
+                {% if updates %}
+                <hr class="intro-divider">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="55%"> Filename</th>
+                        <th width="15%"> Version</th>
+                        <th width="15%"> Size</th>
+                        <th width="15%"> Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for update in updates %}
+                    <tr>
+                        <td>{{ update.filename }}</td>
+                        <td>{{ update.version }}</td>
+                        <td>{{ update.size }}</td>
+                        <td>
+                            <a href="#"
+                               onclick="return confirm('Are you sure you want to delete this update ?')">
+                                <i class="fa fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div style="text-align: center">
+                    <h3>No updates have been added.</h3>
+                    <hr class="intro-divider">
+                </div>
+                {% endif %}
+                <a href="#" class="btn btn-default btn-lg">
+                    <i class="fa fa-plus"></i>
+                    Check for new updates
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
