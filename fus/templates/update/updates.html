@@ -27,7 +27,7 @@
                         <td>{{ update.version }}</td>
                         <td>{{ update.size }}</td>
                         <td>
-                            <a href="#"
+                            <a href="{{ url_for('update.delete_update', id=update.id) }}"
                                onclick="return confirm('Are you sure you want to delete this update ?')">
                                 <i class="fa fa-trash"></i> Delete
                             </a>
@@ -42,7 +42,7 @@
                     <hr class="intro-divider">
                 </div>
                 {% endif %}
-                <a href="#" class="btn btn-default btn-lg">
+                <a href="{{ url_for('update.add_update') }}" class="btn btn-default btn-lg">
                     <i class="fa fa-plus"></i>
                     Check for new updates
                 </a>

@@ -17,7 +17,10 @@ class Config(object):
 
     # FUS configuration
     FUS_EMPTY_UPDATE = '<?xml version="1.0"?><updates></updates>'
-    FUS_DOWNLOAD_PATH = 'http://192.168.248.133/download/'
+    FUS_DOWNLOAD_URL = 'http://192.168.248.133/download/'
+    FUS_RELEASE_URL = 'https://archive.mozilla.org/pub/firefox/releases/'
+    FUS_UPDATE_PATH = "./"
+
 
 
 class DevelopmentConfig(Config):
