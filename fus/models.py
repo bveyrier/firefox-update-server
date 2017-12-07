@@ -46,6 +46,14 @@ class IntermediateUpdate(Base):
     def __repr__(self):
         return "<IntermediateUpdate(id='%s', id_update='%s', version='%s')>" % (self.id, self.id_update, self.version)
 
-# if app.config['SQLALCHEMY_DB_DROP']:
-#     _base.metadata.drop_all(_engine)
-#     _base.metadata.create_all(_engine)
+
+class DownloadTask(Base):
+    __tablename__ = 'download_tasks'
+    id = Column(Integer, primary_key=True)
+    version = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    result = Column(String)
+
+    def __repr__(self):
+        return "<DownloadTask(id='%s', version='%s', status='%s', result='%s')>" % (
+        self.id, self.version, self.status, self.result)
