@@ -46,6 +46,32 @@
                     <i class="fa fa-plus"></i>
                     Check for new updates
                 </a>
+                {% if tasks %}
+                <h1 style="text-align:center;">Downloading tasks</h1>
+                <hr class="intro-divider">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="55%"> Version</th>
+                        <th width="15%"> Status</th>
+                        <th width="15%"> Result</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.version }}</td>
+                        <td>{{ task.status }}</td>
+                        {% if task.status == "Processing" %}
+                        <td>{{ task.result }} %</td>
+                        {% else %}
+                        <td>{{ task.result }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
             </div>
         </div>
     </div>

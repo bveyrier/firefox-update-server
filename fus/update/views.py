@@ -1,4 +1,4 @@
-from fus.models import Update, IntermediateUpdate, Wave
+from fus.models import Update, IntermediateUpdate, Wave, DownloadTask
 from flask import make_response, render_template, redirect, url_for, flash, abort
 from flask_sqlalchemy_session import current_session
 
@@ -38,7 +38,8 @@ def check_update(wave_id=None, version=None):
 @update.route('/updates')
 def list_updates():
     updates = current_session.query(Update).order_by(Update.version).all()
-    return render_template('update/updates.html', updates=updates, title='Updates')
+    tasks = current_session.query(DownloadTask).filter(DownloadTask.status != "Done").all()
+    return render_template('update/updates.html', updates=updates, title='Updates', tasks=tasks)
 
 
 def get_latest_update():
@@ -94,40 +95,74 @@ def sha256(filename):
     return hash_sha256.hexdigest()
 
 
+from threading import Thread
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+class AsyncUpdateDownload(Thread):
+    def __init__(self, version, task_id):
+        Thread.__init__(self)
+        self._version = version
+        self._task_id = task_id
+        self.SQLALCHEMY_DATABASE_URI = Config.SQLALCHEMY_DATABASE_URI
+
+    def run(self):
+        some_engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
+        Session = sessionmaker(bind=some_engine)
+        session = Session()
+        try:
+            task = session.query(DownloadTask).get(self._task_id)
+        except:
+            return
+        try:
+            url = '{release_url}{version}/update/win32/fr/firefox-{version}.complete.mar'.format(
+                release_url=Config.FUS_RELEASE_URL,
+                version=self._version)
+            filename = 'firefox-{version}.complete.mar'.format(version=self._version)
+            full_filename = '{update_path}{filename}'.format(update_path=Config.FUS_UPDATE_PATH,
+                                                             filename=filename)
+            response = urllib2.urlopen(url)
+            meta = response.info()
+            file_size = int(meta.getheaders("Content-Length")[0])
+            file_size_dl = 0
+            f = open(full_filename, 'wb')
+            while True:
+                buffer = response.read(8192)
+                if not buffer:
+                    break
+                file_size_dl += len(buffer)
+                task.result = file_size_dl * 100 / file_size
+                session.commit()
+                f.write(buffer)
+            f.close()
+            details_url = 'https://www.mozilla.org/en-US/firefox/{version}/releasenotes/'.format(
+                version=self._version.replace("esr", ""))
+            u = Update(filename=filename,
+                       version=self._version,
+                       hash_function='SHA256',
+                       hash_value=sha256(full_filename),
+                       size=file_size,
+                       details_url=details_url,
+                       patch_type='complete',
+                       update_type='minor')
+            task.status = "Done"
+            session.add(u)
+            session.commit()
+        except:
+            task.status = "Error"
+            task.result = "Error: Enable to download update {version}".format(version=self._version)
+            session.commit()
+
+
 @update.route('/updates/add/<version>')
 def download_update(version):
     try:
-        url = '{release_url}{version}/update/win32/fr/firefox-{version}.complete.mar'.format(
-            release_url=Config.FUS_RELEASE_URL,
-            version=version)
-        filename = 'firefox-{version}.complete.mar'.format(version=version)
-        full_filename = '{update_path}{filename}'.format(update_path=Config.FUS_UPDATE_PATH,
-                                                         filename=filename)
-        response = urllib2.urlopen(url)
-        meta = response.info()
-        file_size = int(meta.getheaders("Content-Length")[0])
-        file_size_dl = 0
-        f = open(full_filename, 'wb')
-        while True:
-            buffer = response.read(8192)
-            if not buffer:
-                break
-            file_size_dl += len(buffer)
-            f.write(buffer)
-        f.close()
-        details_url = 'https://www.mozilla.org/en-US/firefox/{version}/releasenotes/'.format(
-            version=version.replace("esr", ""))
-        u = Update(filename=filename,
-                   version=version,
-                   hash_function='SHA256',
-                   hash_value=sha256(full_filename),
-                   size=file_size,
-                   details_url=details_url,
-                   patch_type='complete',
-                   update_type='minor')
-        current_session.add(u)
+        task = DownloadTask(status="Processing", version=version)
+        current_session.add(task)
         current_session.commit()
-        flash("Update successfully downloaded")
+        worker = AsyncUpdateDownload(version=version, task_id=task.id)
+        worker.start()
+        flash("Update download started")
     except:
         flash("Error : Unable to download update")
     return redirect(url_for('update.list_updates'))

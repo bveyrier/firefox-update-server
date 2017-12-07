@@ -22,6 +22,10 @@ def create_app(config_name):
 
     from fus import models
 
+    if app.config['SQLALCHEMY_DATABASE_DROP']:
+        Base.metadata.drop_all(_engine)
+        Base.metadata.create_all(_engine)
+
     from .update import update as update_blueprint
     app.register_blueprint(update_blueprint)
 
