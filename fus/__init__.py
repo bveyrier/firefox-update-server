@@ -8,7 +8,10 @@ from flask_bootstrap import Bootstrap
 from config import app_config
 
 Base = declarative_base()
+_engine = None
 
+def get_dbengine():
+    return _engine
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)

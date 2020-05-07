@@ -1,6 +1,13 @@
 Flask
 Flask-Bootstrap
+SQLAlchemy
 Flask-SQLAlchemy
 Flask-SQLAlchemy-Session
+Flask-Migrate
+Flask-Script
+psycopg2
 Flask-Psycopg2
+WTForms
 Flask-WTF
+requests
+natsort

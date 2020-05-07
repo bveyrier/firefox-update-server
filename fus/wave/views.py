@@ -3,7 +3,7 @@ from flask import render_template, flash, url_for, redirect, abort
 from flask_sqlalchemy_session import current_session
 
 from . import wave
-from forms import WaveForm
+from .forms import WaveForm
 
 
 @wave.route('/waves')

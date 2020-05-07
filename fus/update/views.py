@@ -1,11 +1,11 @@
 from fus.models import Update, IntermediateUpdate, Wave, DownloadTask
 from flask import make_response, render_template, redirect, url_for, flash, abort
 from flask_sqlalchemy_session import current_session
-
-from fus.utils.natsort import natsorted, natcmp
-import urllib2
+import requests
+from natsort import natsorted, natsort_key
+import urllib.request
 import hashlib
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 
 from config import Config
 from . import update
@@ -25,11 +25,11 @@ def check_update(wave_id=None, version=None):
             version < IntermediateUpdate.version).all()
         if (intermediate_update != None):
             for up in intermediate_update:
-                if natcmp(version, up.update.version) < 0:
+                if natsort_key(version) < natsort_key(up.update.version) < 0:
                     return make_xml(
                         render_template('update/update.xml', update=up.update,
                                         download_path=Config.FUS_DOWNLOAD_URL))
-        if natcmp(version, wave.update.version) < 0:
+        if natsort_key(version) < natsort_key(wave.update.version):
             return make_xml(
                 render_template('update/update.xml', update=wave.update, download_path=Config.FUS_DOWNLOAD_URL))
     return make_xml(Config.FUS_EMPTY_UPDATE)
@@ -68,23 +68,18 @@ class MyHTMLParser(HTMLParser):
                     value = str.replace(value, "/pub/firefox/releases/", "")
                     value = str.replace(value, "/pub/firefox/", "")
                     value = str.replace(value, "/", "")
-                    if value != "" and value != "latest-esr" and natcmp(value, self._version_min) > 0:
+                    if value != "" and value != "latest-esr" and natsort_key(value) >  natsort_key(self._version_min):
                         self._updates.append(value)
 
 
 @update.route('/updates/add')
 def add_update():
-    try:
-        response = urllib2.urlopen(Config.FUS_RELEASE_URL)
-        html = response.read()
-        parser = MyHTMLParser(get_latest_update())
-        parser.feed(html)
-        updates = parser.updates
-        updates = natsorted(updates)
-        return render_template('update/update.html', updates=updates, title='Updates')
-    except:
-        flash("Error : Unable to contact Mozzila servers")
-    return redirect(url_for('update.list_updates'))
+    response = requests.get(Config.FUS_RELEASE_URL)
+    parser = MyHTMLParser(get_latest_update())
+    parser.feed(response.text)
+    updates = parser.updates
+    updates = natsorted(updates)
+    return render_template('update/update.html', updates=updates, title='Updates')
 
 
 def sha256(filename):
@@ -115,26 +110,21 @@ class AsyncUpdateDownload(Thread):
         except:
             return
         try:
-            url = '{release_url}{version}/update/win32/fr/firefox-{version}.complete.mar'.format(
+            url = '{release_url}{version}/update/win64/fr/firefox-{version}.complete.mar'.format(
                 release_url=Config.FUS_RELEASE_URL,
                 version=self._version)
             filename = 'firefox-{version}.complete.mar'.format(version=self._version)
             full_filename = '{update_path}{filename}'.format(update_path=Config.FUS_UPDATE_PATH,
                                                              filename=filename)
-            response = urllib2.urlopen(url)
-            meta = response.info()
-            file_size = int(meta.getheaders("Content-Length")[0])
+            response = requests.get(url, stream=True)
+            file_size = int(response.headers['Content-Length'])
             file_size_dl = 0
-            f = open(full_filename, 'wb')
-            while True:
-                buffer = response.read(8192)
-                if not buffer:
-                    break
-                file_size_dl += len(buffer)
-                task.result = file_size_dl * 100 / file_size
-                session.commit()
-                f.write(buffer)
-            f.close()
+            with open(full_filename, 'wb') as fd:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file_size_dl += fd.write(chunk)
+                    task.result = file_size_dl * 100 / file_size
+                    session.commit()
+            response.close()
             details_url = 'https://www.mozilla.org/en-US/firefox/{version}/releasenotes/'.format(
                 version=self._version.replace("esr", ""))
             u = Update(filename=filename,
@@ -150,7 +140,7 @@ class AsyncUpdateDownload(Thread):
             session.commit()
         except:
             task.status = "Error"
-            task.result = "Error: Enable to download update {version}".format(version=self._version)
+            task.result = "Error: Unable to download update {version}".format(version=self._version)
             session.commit()
 
 

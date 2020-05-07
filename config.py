@@ -1,4 +1,4 @@
-import os
+from secrets import token_hex
 
 
 class Config(object):
@@ -9,10 +9,10 @@ class Config(object):
     # Server configuration
     HOST = '127.0.0.1'
     PORT = 8080
-    SECRET_KEY = os.urandom(24).encode('hex')
+    SECRET_KEY = token_hex(24)
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = 'postgresql://fus:plop@localhost/'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://fus:novell@192.168.52.137:5432/fus'
     SQLALCHEMY_DATABASE_DROP = False
 
     # FUS configuration

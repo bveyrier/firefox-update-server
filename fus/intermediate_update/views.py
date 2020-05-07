@@ -3,7 +3,7 @@ from flask import render_template, flash, url_for, redirect, abort
 from flask_sqlalchemy_session import current_session
 
 from . import intermediate_update
-from forms import IntermediateUpdateForm
+from .forms import IntermediateUpdateForm
 
 
 @intermediate_update.route('/intermediate_updates')
